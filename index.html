@@ -470,54 +470,30 @@ function submitBid(){
   btn.disabled=true;
   btn.textContent='Submitting...';
 
-  // Build a hidden native form and POST to Formspree
-  const formspreeURL='https://formspree.io/f/mbdeyede';
-
-  const fields={
+  const templateParams={
     firstName: document.getElementById('fname').value.trim(),
     lastName:  document.getElementById('lname').value.trim(),
     email:     document.getElementById('email').value.trim(),
     phone:     document.getElementById('phone').value.trim(),
     bid:       document.getElementById('bid').value,
     pairs:     document.getElementById('pairs').value,
-    referral:  document.getElementById('referral').value,
-    _replyto:  document.getElementById('email').value.trim(),
-    _subject:  'New Bid — Ye Tampa'
+    referral:  document.getElementById('referral').value
   };
 
-  const hf=document.createElement('form');
-  hf.method='POST';
-  hf.action=formspreeURL;
-  hf.target='fs-iframe';
-  hf.style.display='none';
-
-  Object.entries(fields).forEach(([k,v])=>{
-    const inp=document.createElement('input');
-    inp.type='hidden';
-    inp.name=k;
-    inp.value=v;
-    hf.appendChild(inp);
-  });
-
-  // Hidden iframe so page doesn't redirect
-  let iframe=document.getElementById('fs-iframe');
-  if(!iframe){
-    iframe=document.createElement('iframe');
-    iframe.id='fs-iframe';
-    iframe.name='fs-iframe';
-    iframe.style.display='none';
-    document.body.appendChild(iframe);
-  }
-
-  document.body.appendChild(hf);
-  hf.submit();
-  document.body.removeChild(hf);
-
-  setTimeout(()=>{
+  emailjs.send('service_o592n4r','template_l59mmkz', templateParams)
+  .then(()=>{
     document.getElementById('form-wrap').style.display='none';
     document.getElementById('success-state').style.display='block';
-  },800);
+  })
+  .catch((err)=>{
+    console.error('EmailJS error:', err);
+    btn.disabled=false;
+    btn.textContent='Submit Bid →';
+    alert('Something went wrong. Please try again or DM @10x10.entertainment on Instagram.');
+  });
 }
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>emailjs.init("uCONiAtocf-04zWI2");</script>
 </body>
 </html>
