@@ -470,50 +470,32 @@ function submitBid(){
   btn.disabled=true;
   btn.textContent='Submitting...';
 
-  const formId='1FAIpQLSfLyF2x5dEzDWB5A-8ePf5aL2mGH5dZbTDD12TBOpO7UkIUsA';
-  const base='https://docs.google.com/forms/d/e/'+formId+'/formResponse';
+  const scriptURL='https://script.google.com/macros/s/AKfycby9RqphvzEh-WRSF-wAu2UwKLjzQ-n5TOlAZu3i8WDpy17s1LENtgVP945gYyB2pbb8/exec';
 
-  const params=new URLSearchParams();
-  params.append('entry.1651096175', document.getElementById('fname').value.trim());
-  params.append('entry.712700534',  document.getElementById('lname').value.trim());
-  params.append('emailAddress',     document.getElementById('email').value.trim());
-  params.append('entry.215635147',  document.getElementById('phone').value.trim());
-  params.append('entry.395364231',  document.getElementById('bid').value);
-  params.append('entry.2036648318', document.getElementById('pairs').value);
-  params.append('entry.132212730',  document.getElementById('referral').value);
+  const payload={
+    firstName: document.getElementById('fname').value.trim(),
+    lastName:  document.getElementById('lname').value.trim(),
+    email:     document.getElementById('email').value.trim(),
+    phone:     document.getElementById('phone').value.trim(),
+    bid:       document.getElementById('bid').value,
+    pairs:     document.getElementById('pairs').value,
+    referral:  document.getElementById('referral').value
+  };
 
-  // Submit via hidden iframe to avoid CORS redirect issues
-  let iframe=document.getElementById('gf-iframe');
-  if(!iframe){
-    iframe=document.createElement('iframe');
-    iframe.id='gf-iframe';
-    iframe.name='gf-iframe';
-    iframe.style.display='none';
-    document.body.appendChild(iframe);
-  }
-
-  const form=document.createElement('form');
-  form.method='POST';
-  form.action=base;
-  form.target='gf-iframe';
-  form.style.display='none';
-
-  params.forEach((val,key)=>{
-    const input=document.createElement('input');
-    input.type='hidden';
-    input.name=key;
-    input.value=val;
-    form.appendChild(input);
-  });
-
-  document.body.appendChild(form);
-  form.submit();
-  document.body.removeChild(form);
-
-  setTimeout(()=>{
+  fetch(scriptURL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(()=>{
     document.getElementById('form-wrap').style.display='none';
     document.getElementById('success-state').style.display='block';
-  },800);
+  })
+  .catch(()=>{
+    document.getElementById('form-wrap').style.display='none';
+    document.getElementById('success-state').style.display='block';
+  });
 }
 </script>
 </body>
