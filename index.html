@@ -470,32 +470,53 @@ function submitBid(){
   btn.disabled=true;
   btn.textContent='Submitting...';
 
-  const scriptURL='https://script.google.com/macros/s/AKfycby9RqphvzEh-WRSF-wAu2UwKLjzQ-n5TOlAZu3i8WDpy17s1LENtgVP945gYyB2pbb8/exec';
+  // Build a hidden native form and POST to Formspree
+  const formspreeURL='https://formspree.io/f/mbdeyede';
 
-  const payload={
+  const fields={
     firstName: document.getElementById('fname').value.trim(),
     lastName:  document.getElementById('lname').value.trim(),
     email:     document.getElementById('email').value.trim(),
     phone:     document.getElementById('phone').value.trim(),
     bid:       document.getElementById('bid').value,
     pairs:     document.getElementById('pairs').value,
-    referral:  document.getElementById('referral').value
+    referral:  document.getElementById('referral').value,
+    _replyto:  document.getElementById('email').value.trim(),
+    _subject:  'New Bid — Ye Tampa'
   };
 
-  fetch(scriptURL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  })
-  .then(()=>{
-    document.getElementById('form-wrap').style.display='none';
-    document.getElementById('success-state').style.display='block';
-  })
-  .catch(()=>{
-    document.getElementById('form-wrap').style.display='none';
-    document.getElementById('success-state').style.display='block';
+  const hf=document.createElement('form');
+  hf.method='POST';
+  hf.action=formspreeURL;
+  hf.target='fs-iframe';
+  hf.style.display='none';
+
+  Object.entries(fields).forEach(([k,v])=>{
+    const inp=document.createElement('input');
+    inp.type='hidden';
+    inp.name=k;
+    inp.value=v;
+    hf.appendChild(inp);
   });
+
+  // Hidden iframe so page doesn't redirect
+  let iframe=document.getElementById('fs-iframe');
+  if(!iframe){
+    iframe=document.createElement('iframe');
+    iframe.id='fs-iframe';
+    iframe.name='fs-iframe';
+    iframe.style.display='none';
+    document.body.appendChild(iframe);
+  }
+
+  document.body.appendChild(hf);
+  hf.submit();
+  document.body.removeChild(hf);
+
+  setTimeout(()=>{
+    document.getElementById('form-wrap').style.display='none';
+    document.getElementById('success-state').style.display='block';
+  },800);
 }
 </script>
 </body>
